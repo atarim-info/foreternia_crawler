@@ -11,6 +11,7 @@
 #     Each unique thread will have a filename prefix (chosen by you).
 #     Each post will be a JSON file with the page link, title, published time and content.
 
+import typer
 import requests
 import yaml
 import concurrent.futures
@@ -150,4 +151,4 @@ def main():
     
 
 if __name__ == '__main__':
-    main()
+     typer.run(main)
