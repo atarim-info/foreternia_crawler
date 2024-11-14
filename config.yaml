@@ -1,0 +1,6 @@
+url: https://foreternia.com
+authentication:
+    username: wefove8865
+    password: Wefove8865@1234
+    cookie: bpaf-default-filter=1; wordpress_test_cookie=WP%20Cookie%20check; wordpress_logged_in_87605b8bf7bcb8ae6f0f4bf077d31cea=wefove8865%7C1732798342%7CCMPSEEDJnceSR7x4gZbwgNk9u9msyPytJcoc4dLpvGv%7C168b2bf2ac11309cd07749f8907e1fa5a2c3e63312a2f5f5e8bb994829e5eeae
+max_threads: 2 # Maximum number of concurrent threads
