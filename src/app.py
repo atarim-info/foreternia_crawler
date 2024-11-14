@@ -17,6 +17,7 @@ import yaml
 import concurrent.futures
 from concurrent.futures import ThreadPoolExecutor
 import logging
+import os
 
 # import data_extractor.extractor as extractor
 from data_extractor import extractor as extractor
@@ -24,6 +25,9 @@ from data_extractor import extractor as extractor
 # Set up logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+
+output_dir = "data"
+os.makedirs(output_dir, exist_ok=True)
 
 """
     Loads the configuration from config.yaml.
@@ -101,11 +105,11 @@ def process_topic(session, topic):
     """
     Process a single topic URL using the provided session
     """
-    logger.debug(f"Processing topic {topic['title']}")
+    logger.debug(f"Processing topic: \"{topic['title']}\"")
     try:
-        return extractor.get_data_from_topic_page(session, topic)
+        return extractor.get_data_from_topic_page(session, topic, output_dir=output_dir)
     except Exception as e:
-        logger.error(f"Error processing topic {topic}: {str(e)}")
+        logger.error(f"Error processing topic: \"{topic}\": {str(e)}")
         return None
     
 def main():
@@ -117,16 +121,16 @@ def main():
     
     url = config['url']
 
-    # extractor.get_data_from_homepage(session, url)
+    # extractor.get_data_from_homepage(session, url, output_dir=output_dir)
     
-    topics = extractor.get_data_from_anouncements_page(session, url)
+    topics = extractor.get_data_from_anouncements_page(session, url, output_dir=output_dir)
     # for topic in topics["topics"]:
-    #     extractor.get_data_from_topic_page(session, topic["url"])
+    #     extractor.get_data_from_topic_page(session, url, output_dir=output_dir)
 
     # Get the thread count from config, default to 2 if not specified
     max_threads = config.get('max_threads', 2)
     
-    topics = extractor.get_data_from_anouncements_page(session, url)
+    topics = extractor.get_data_from_anouncements_page(session, url, output_dir=output_dir)
     
     # Create a ThreadPoolExecutor with the specified number of threads
     with ThreadPoolExecutor(max_workers=max_threads) as executor:

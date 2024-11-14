@@ -14,10 +14,7 @@ headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
 }
 
-output_dir = "data"
-os.makedirs(output_dir, exist_ok=True)
-
-def get_data_from_anouncements_page(session, url):
+def get_data_from_anouncements_page(session, url, output_dir):
     forum_url = url +  '/community/announcement-forum/'
     response = session.get(forum_url, headers=headers)
     if response.status_code == 200:
@@ -47,7 +44,7 @@ def get_data_from_anouncements_page(session, url):
 
         # Save the post data to a JSON file
         topics_file = "forum_topics.json"
-        with open(os.path.join(output_dir, topics_file), "w") as f:
+        with open(os.path.join(output_dir, topics_file), "w", encoding='utf-8') as f:
             json.dump(forum_topics, f, indent=2)
 
         logger.info(f"Saved {len(forum_topics['topics'])} forum topics to the '{output_dir}/{topics_file}' file.")
@@ -55,7 +52,7 @@ def get_data_from_anouncements_page(session, url):
         return forum_topics
 
 
-def get_data_from_topic_page(session, topic):
+def get_data_from_topic_page(session, topic, output_dir):
     topic_url = topic["url"]
     response = session.get(topic_url, headers=headers)
     if response.status_code == 200:
@@ -66,17 +63,34 @@ def get_data_from_topic_page(session, topic):
         # Iterate over the posts and save each one to a JSON file
         for i, post in enumerate(posts):
             # Extract the post title and content
-            get_single_post_data(post)
+            try :
+                dump_single_post_data(post, output_dir=output_dir)
+            except KeyError as e:
+                logger.warning(f"Post \"{post}\" has no id. Skipping.")
+                continue
 
         logger.info(f"Processed topic \"{topic['title']}\". Saved {len(posts)} posts to the '{output_dir}' directory.")
 
-def get_single_post_data(post):
+"""
+    Extracts the post data from a BeautifulSoup post element and saves it to a JSON file.
+
+    Args:
+        post (bs4.element.Tag): A BeautifulSoup post element.
+        output_dir (str): The directory to save the JSON file to.
+
+    Returns:
+        dict: A dictionary with the post data.
+"""
+def dump_single_post_data(post, output_dir):
     id = post.get("id")
+    if id is None:
+        raise KeyError(f"Post \"{post}\" has no id. Skipping.")
+    
     author = post.find("div", class_="author-name").text.strip()
     content = post.find("div", class_="wpforo-post-content").get_text(strip=True)
     content_bottom = post.find("div", class_="wpforo-post-content-bottom").get_text(strip=True)
 
-            # Create a dictionary with the post data
+    # Create a dictionary with the post data
     post_data = {
                 "id": id,
                 "author": author,
@@ -84,12 +98,13 @@ def get_single_post_data(post):
                 "content_bottom": content_bottom
             }
 
-            # Save the post data to a JSON file
-    with open(os.path.join(output_dir, f"{id}.json"), "w") as f:
+    # Save the post data to a JSON file
+    with open(os.path.join(output_dir, f"{id}.json"), "w", encoding='utf-8') as f:
         json.dump(post_data, f, indent=2)
 
+    return post_data
 
-def get_data_from_homepage(session, url):
+def get_data_from_homepage(session, url, output_dir):
     # forum_url = url + '/forums/'
     forum_url = url +  '/page/1'
     response = session.get(forum_url, headers=headers)
@@ -109,6 +124,7 @@ def get_data_from_homepage(session, url):
                 'title': title,
                 'post': post
             }
-
-            with open(f'data/{post_id}.json', 'w') as f:
-                json.dump(data, f, ensure_ascii=False, indent=4)
+            
+            # Save the post data to a JSON file            
+            with open(os.path.join(output_dir, f"{post_id}.json"), "w", encoding='utf-8') as f:
+                json.dump(data, f, indent=2)
