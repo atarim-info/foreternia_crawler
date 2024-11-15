@@ -33,7 +33,7 @@ class TestDumpSinglePostData(unittest.TestCase):
     @patch('json.dump')
     @patch('os.path.join')
     def test_valid_post(self, mock_join, mock_dump):
-        post_data = extractor.dump_single_post_data(self.post, output_dir=output_dir)
+        post_data = extractor.get_single_post_data(self.post, output_dir=output_dir)
         self.maxDiff = None
         self.assertEqual(post_data, self.post_mock_data)
         
@@ -43,28 +43,28 @@ class TestDumpSinglePostData(unittest.TestCase):
     def test_missing_post_id(self, mock_join, mock_dump):
         self.post.attrs.pop("id")
         with self.assertRaises(KeyError):
-            extractor.dump_single_post_data(self.post, output_dir=output_dir)
+            extractor.get_single_post_data(self.post, output_dir=output_dir)
 
     @patch('json.dump')
     @patch('os.path.join')
     def test_missing_author_name(self, mock_join, mock_dump):
         self.post.find("div", class_="author-name").decompose()
         with self.assertRaises(AttributeError):
-            extractor.dump_single_post_data(self.post, output_dir=output_dir)
+            extractor.get_single_post_data(self.post, output_dir=output_dir)
 
     @patch('json.dump')
     @patch('os.path.join')
     def test_missing_post_content(self, mock_join, mock_dump):
         self.post.find("div", class_="wpforo-post-content").decompose()
         with self.assertRaises(AttributeError):
-            extractor.dump_single_post_data(self.post, output_dir=output_dir)
+            extractor.get_single_post_data(self.post, output_dir=output_dir)
 
     @patch('json.dump')
     @patch('os.path.join')
     def test_missing_content_bottom(self, mock_join, mock_dump):
         self.post.find("div", class_="wpforo-post-content-bottom").decompose()
         with self.assertRaises(AttributeError):
-            extractor.dump_single_post_data(self.post, output_dir=output_dir)
+            extractor.get_single_post_data(self.post, output_dir=output_dir)
 
 if __name__ == '__main__':
     unittest.main()

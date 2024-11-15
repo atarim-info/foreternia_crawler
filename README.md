@@ -12,9 +12,6 @@ Data structure:
     - Each unique thread will have a filename prefix (chosen by you).
     - Each post will be a JSON file with the page link, title, published time and content.
 
-
-## User Profile Microservice
-
 ## Pre-requisites
 You must have following software on your machine,
 - Python 3.x or beyond
@@ -28,12 +25,22 @@ pipenv install
 Activates virualenv.
 ```
 pipenv shell
+pipenv sync
+```
+## Run Tests
+Test locally
+```
+pytest tests/
 ```
 
 ## Run Application
 Start applciation locally
 ```
-python app.py
+python src/app.py
 ```
 
-```docker build -t crawler:latest .```
+## Create Docker image
+
+```
+docker build -t crawler:latest .
+```
